@@ -1,38 +1,8 @@
-// const rp = require ('request-promise');
-// const R  = require ('ramda');
-// const fs = require ('fs');
 var   Decimal = require('decimal.js');
 var   json2csv= require('json2csv');
-// Decimal.set({ precision: 50 });
-// Decimal.set({ rounding: 8 });
-// const csvParser = require ('csv-parse');
-// const request = require ('request');
-// const ETH_URL = require ('../global_exports').eth_url;
-// const ADDR_MAP_URL = require ('../global_exports').ico_addr_map;
-// const START_DATE = require ('../global_exports').start_date;
-// const END_DATE = require ('../global_exports').end_date;
-// const dateformat = require ('dateformat');
-// const json2csv = require ('json2csv');
 const async   = require ('async');
-// const ETH_API_KEY     = process.env.ETH_API_KEY || null;
-// const ETH_CONVERT     = require('../global_exports').eth_conversion;
-// const eth_ref_addr = require ('../global_exports').referral_addr;
-// const audit_exceptions_file = require ('../global_exports').audit_file;
-// const BTC_CONVERT = require ('../global_exports').btc_conversion;
-// const BTC_URL = require ('../global_exports').btc_url;
-// const END_BTC_PRICE = require ('../global_exports').end_btc_price;
-// const cash_contributions = require ('../global_exports').cash_contrib;
-// const presale_contributions = require ('../global_exports').presale_cont;
-// const presale_date = require ('../global_exports').presale_date;
-// const presale_close = require ('../global_exports').presale_close;
-// const util    = require ('util');
-// // var   mc = require ('../mem-client');
-// const START_BLOCK     = 4330703;
-// const END_BLOCK       = 99999999;
-// const public_dragons = 238421940;
 var   bittrex_hourly = {}; // converting eth-btc at hourly
 var   redeem_addresses = {};
-// var   graph_lookup = "%s-transaction-graph";
 var   exceptions    = [];
 var   csv_loader    = require ('./global_variables').csv_loader;
 var   write_csv     = require ('./global_variables').write_csv;
@@ -46,24 +16,23 @@ var   END_DATE      = require ('./global_variables').end_date;
 var   presale_date  = require ('./global_variables').presale_date;
 var   public_dragons= require ('./global_variables').public_drgns;
 
-
-var init = function(){
+var init = function(base_folder){
   // loads the csv files
   async.parallel([
     function(callback){
-      csv_loader('csv/bittrex-hourly.csv',callback);
+      csv_loader(base_folder+'/bittrex-hourly.csv',callback);
     },
     function(callback){
-      csv_loader('csv/btc-transactions.csv',callback);
+      csv_loader(base_folder+'/btc-transactions.csv',callback);
     },
     function(callback){
-      csv_loader('csv/eth-transactions.csv',callback);
+      csv_loader(base_folder+'/eth-transactions.csv',callback);
     },
     function(callback){
-      csv_loader('csv/bitcoin-addresses.csv',callback);
+      csv_loader(base_folder+'/bitcoin-addresses.csv',callback);
     },
     function(callback){
-      csv_loader('csv/audit-exceptions.csv',callback);
+      csv_loader(base_folder+'/audit-exceptions.csv',callback);
     }
   ], function(err, results){
     var bittrex_results  = results[0];
@@ -74,7 +43,7 @@ var init = function(){
 
     // load bitcoin address to ethereum redeem address linkings
     for(var i=0; i<btc_address_map.length; i+=1){
-      if(btc_address_map[i][0]) redeem_addresses[btc_address_map[i][0]] = btc_address_map[i][1];
+      if(btc_address_map[i]['BTC_ADDRESS']) redeem_addresses[btc_address_map[i]['BTC_ADDRESS']] = btc_address_map[i]['ETH_PAYOUT'];
     }
 
     // load audit exceptions
@@ -145,14 +114,10 @@ var format_table = function(type,arr){
     temp['timestamp'] = new Date(parseInt(temp['unix-epoch'])).toLocaleString();
     temp['txid'] = arr[i]['txid'];
     temp['type'] = (type=='btc')?'btc':'eth';
-    temp['ethereum_payout_address'] = (type=='btc')?redeem_addresses[arr[i].address]:arr[i].from;
+    temp['ethereum_payout_address'] = (type=='btc')?redeem_addresses[arr[i].to]:arr[i].from;
     temp['btc_value'] = (type=='btc')?arr[i].amount:arr[i]['amount_btc'];
     temp['btc'] = (type=='btc')?arr[i].amount:0;
     temp['eth'] = (type=='eth')?arr[i].amount:0;
-    temp['%'] = null;
-    temp['dragons'] = null;
-    temp['exception'] = null;
-    temp['type_of_exception'] = null;
     if(type=='btc') temp['convert_rate'] = 1;
     else temp['convert_rate'] = arr[i]['convert_rate'];
     final.push(temp);
@@ -216,58 +181,9 @@ var calculate_total_btc = function(arr){
   return final;
 }
 
-// var get_transactions = function(callback) {
-//   get_address_mapping(function(err,result){
-//     if(result){
-//       get_hourly_bittrex();
-//       async.series([
-//         function (callback) {
-//           var key = util.format(graph_lookup, 'btc');
-//           get_memcache(key, callback);
-//         }
-//       ], function (err, results) {
-//         if (err) console.log(err);
-//         else {
-//           ethereum_query(function(err,result){
-//             if(result){
-//               console.log('calculating results');
-//               var eth_array = result;
-//               var btc_array = unpack_structure(results[0]);
-//               var presale = presale_loader(presale_contributions);
-//               eth_array = convert_ethereum(eth_array);
-//               eth_array = format_table('eth',eth_array);
-//               btc_array = format_table('btc',btc_array);
-//               var btc_cash_value = format_cash(cash_contributions);
-//               var combined = eth_array.concat(btc_array);
-//               combined = combined.concat(btc_cash_value);
-//               combined = combined.concat(presale);
-//               combined = combined.sort(sort_json);
-//               combined = calculate_total_btc(combined);
-//               var stringified = stringify_json(combined);
-//               var paginated_results = R.splitEvery(1000,stringified);
-//               var joined_page = join_array(paginated_results);
-//               joined_page = add_index('audit_',joined_page);
-//               async.each(joined_page,insert_memcache,function(err){
-//                 if(err) console.log(err);
-//                 else {
-//                   var fields = [{label:'Timestamp (PDT)',value:'timestamp'},{label:'Unix-Epoch (UTC)',value:'unix-epoch'},'txid','type','ethereum_payout_address','convert_rate','btc_value','btc','eth','%','dragons','exception','type_of_exception'];
-//                   var opts = {
-//                     data: combined,
-//                     fields: fields,
-//                     defaultValue: 0
-//                   }
-//                   var csv = json2csv(opts)
-//                   callback(null,csv);
-//                 }
-//               });
-//             } else {
-//               callback(err);
-//             }
-//           });
-//         }
-//       });
-//     }
-//   });
-// }
+if(process.argv.length < 3){
+  console.log('no csv file specified');
+  process.exit(1);
+}
 
-init();
+init(process.argv[2]);

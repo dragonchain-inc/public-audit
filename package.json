@@ -4,7 +4,7 @@
   "description": "Standalone application for generating the csv file used in the audit",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dragonchain": "node index.js dragonchain-public-audit-csv"
   },
   "repository": {
     "type": "git",

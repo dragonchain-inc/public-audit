@@ -14,7 +14,7 @@ var csv_loader = function(file,callback){
         if(err) {
           console.log(err);
           callback(err);
-        }
+        } 
         var headers = data[0];
         var list = [];
         for(var i=1; i<data.length; i+=1){
@@ -45,11 +45,11 @@ var write_csv = function(csv,callback){
 // format cash contributions
 var format_cash = function(arr){
   var final = [];
-  var date_unix = new Date(END_DATE).getTime();
+  var date_unix = new Date(CASH_CLOSE).getTime();
   for(var i=0; i<arr.length; i+=1) {
     var temp = {};
     temp['unix-epoch'] = date_unix;
-    temp['timestamp'] = END_DATE;
+    temp['timestamp'] = CASH_CLOSE;
     temp['txid'] = 'partner';
     temp['type'] = 'usd';
     temp['ethereum_payout_address'] = (arr[i].length>1)?arr[i][1]:null;
@@ -92,10 +92,12 @@ var sort_unix = function(a,b){return a['unix-epoch'] - b['unix-epoch'];}
 
 // global variables
 const START_DATE = "10/02/2017 08:00:00 AM"; //in PDT
-const END_DATE = "11/02/2017 05:00:00 PM"; //in PDT
+// the final block time from transactions submitted before 5 PM PDT
+const END_DATE = "11/02/2017 05:11:30 PM"; //in PDT
 const PRESALE_DATE = "08/22/2017 06:00:00 PM"; // in PDT
+const CASH_CLOSE = "11/02/2017 04:59:59 PM";
 const END_BTC_PRICE = 6979.51; // close BTC price for November 2, 2017 at 5:00:00 PM PDT
-const public_dragons= 238421940;
+const public_dragons= 238421940.35;
 
 const audit_exceptions_file = "audit-exceptions.csv";
 
@@ -123,3 +125,4 @@ module.exports.cash_contr   = cash_contributions;
 module.exports.presale_contr= presale_contributions;
 module.exports.presale_close= presale_close_ethbtc;
 module.exports.public_drgns = public_dragons;
+module.exports.cash_close   = CASH_CLOSE;
