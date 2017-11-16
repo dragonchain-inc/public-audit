@@ -101,12 +101,14 @@ const public_dragons= 238421940.35;
 
 const audit_exceptions_file = "audit-exceptions.csv";
 
-// contributions from partners during the sale
-var cash_contributions = [[25000],[114570],[10000],[5000],[4040],[10000,'0xd683676D376b136C7b169f530Fb06239FbF8544e'],
+// contributions from partners during the sale and the associated DRGN receiving addresses
+var cash_contributions = [[100000],
+  [10000,'0x5cb51ba463dd559996b36121Cec1F087EeEd2397'],
   [10000,'0xB0F5d7BA0E425c1Ff406F4f0946E4680562837F4'],
-  [500,'0x3ff7E67B452bCa45E009328022bC1B84bB8ce7CD'],
-  [530,'0x3ff7E67B452bCa45E009328022bC1B84bB8ce7CD'],
-  [500,'0xF3EF427D03316E4240f95d566292FA265bbE81A8']];
+  [10000,'0x37756183530e7871F067acDaaD1a780A6514241a'],
+  [5000,'0xe7c2ae32Ab822e79E658981d51b7A4c4eC80222B'],
+  [4040,'0xb3b7aC365fbb97E67F30074A042423C9A04e0451'],
+  [530,'0x3ff7E67B452bCa45E009328022bC1B84bB8ce7CD']];
 
 var presale_contributions = [{type: 'btc',amount: 152.25},{type: 'eth',amount: 2357.53}]; // results from the presale
 var presale_close_ethbtc  = 0.076320; // close conversion rate for August 22, 2017 at 6:00:00 PM PDT
