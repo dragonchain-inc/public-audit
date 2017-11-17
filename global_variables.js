@@ -1,6 +1,8 @@
 const fs     = require ('fs');
 const parser = require ('csv-parse');
 const Decimal= require ('decimal.js');
+Decimal.set({ precision: 50 });
+Decimal.set({ rounding: 8 });
 
 // global functions
 var csv_loader = function(file,callback){
@@ -78,7 +80,7 @@ var presale_loader = function(arr){
     temp[arr[i].type] = arr[i].amount;
     temp['convert_rate'] = presale_close_ethbtc;
     temp['ethereum_payout_address'] = null;
-    temp['btc_value'] = (arr[i].type == 'btc')?arr[i].amount:new Decimal(arr[i].amount).mul(presale_close_ethbtc).toString();
+    temp['btc_value'] = (arr[i].type == 'btc')?arr[i].amount.toString():new Decimal(arr[i].amount).mul(presale_close_ethbtc).toString();
     temp['%'] = null;
     temp['dragons'] = null;
     temp['exception'] = null;
@@ -102,7 +104,8 @@ const public_dragons= 238421940.35;
 const audit_exceptions_file = "audit-exceptions.csv";
 
 // contributions from partners during the sale and the associated DRGN receiving addresses
-var cash_contributions = [[100000],
+var cash_contributions = [
+  [100000,'0xcDbEeb1029411e8D59CED42Ed3e2142B930647B9'],
   [10000,'0x5cb51ba463dd559996b36121Cec1F087EeEd2397'],
   [10000,'0xB0F5d7BA0E425c1Ff406F4f0946E4680562837F4'],
   [10000,'0x37756183530e7871F067acDaaD1a780A6514241a'],

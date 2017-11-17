@@ -1,6 +1,8 @@
 var   Decimal = require('decimal.js');
 var   json2csv= require('json2csv');
 const async   = require ('async');
+Decimal.set({ precision: 50 });
+Decimal.set({ rounding: 8 });
 var   bittrex_hourly = {}; // converting eth-btc at hourly
 var   redeem_addresses = {};
 var   exceptions    = [];
@@ -127,6 +129,7 @@ var format_table = function(type,arr){
 
 var convert_ethereum = function(data){
   var final_array = [];
+  var total_eth = new Decimal(0);
   for(var i=0; i<data.length; i+=1){
     var temp = data[i];
     // convert amount and return
@@ -135,8 +138,9 @@ var convert_ethereum = function(data){
     var hour = timestamp.split(' ')[1].split(':')[0];
     // lookup conversion and insert
     var convert_rate = bittrex_hourly[date][hour]['Close'];
-    temp['amount_btc'] = Decimal.mul(temp['amount'],convert_rate).toString();
+    temp['amount_btc'] = Decimal.mul(temp['amount'],convert_rate);
     temp['convert_rate'] = convert_rate;
+    total_eth = total_eth.plus(temp['amount']);
     final_array.push(temp);
   }
   return final_array;
