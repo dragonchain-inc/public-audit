@@ -159,7 +159,7 @@ var init = function(base_folder){
     combined = handle_hw_swaps(combined,hw_swaps);
 
     // generate the csv
-    var fields = [{label:'Timestamp (PDT)',value:'timestamp'},{label:'Unix-Epoch (UTC)',value:'unix-epoch'},'txid','type','ethereum_payout_address','convert_rate','btc_value','btc','eth','%','dragons','exception','type_of_exception'];
+    var fields = [{label:'Timestamp (PDT)',value:'timestamp'},{label:'Unix-Epoch (UTC)',value:'unix-epoch'},'txid','type','ethereum_payout_address','convert_rate','btc_value','btc','eth','%','dragons','exception','exception_type'];
     var opts = {
       data: combined,
       fields: fields,

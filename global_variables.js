@@ -165,7 +165,6 @@ var handle_hardware_swap = function(audit,swaps){
   for(var i=0; i<audit.length; i+=1){
     var temp = audit[i];
     if(swaps.hasOwnProperty(temp['ethereum_payout_address']) && temp['exception'] != "yes"){
-      console.log('Swapping from address: '+temp['ethereum_payout_address']+' to address: '+swaps[temp['ethereum_payout_address']]);
       temp['ethereum_payout_address'] = swaps[temp['ethereum_payout_address']];
     }
     final.push(temp);
